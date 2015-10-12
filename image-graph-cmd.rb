@@ -11,15 +11,19 @@ Docker::Image.all(all: true).each do |image|
   tags = image.info['RepoTags'].reject { |t| t == '<none>:<none>' }.join('\n')
   parent_id = image.info['ParentId'][0..11]
 
+  if tags.empty?
+    dot_file << "\"#{id}\" [label=\"#{id}\"];"
+  else
+    dot_file << "\"#{id}\" [label=\"#{id}\\n#{tags}\",shape=box,fillcolor=\"paleturquoise\",style=\"filled,rounded\"];"
+  end
+
+
   if parent_id.empty?
     dot_file << "base -> \"#{id}\" [style=invis]"
   else
     dot_file << "\"#{parent_id}\" -> \"#{id}\""
   end
 
-  unless tags.empty?
-    dot_file << "\"#{id}\" [label=\"#{id}\\n#{tags}\",shape=box,fillcolor=\"paleturquoise\",style=\"filled,rounded\"];"
-  end
 end
 
 dot_file << 'base [style=invisible]'
